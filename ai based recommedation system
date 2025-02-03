@@ -1,0 +1,41 @@
+import org.apache.mahout.cf.taste.common.TasteException;
+import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
+import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
+import org.apache.mahout.cf.taste.impl.recommender.ItemSimilarityImpl;
+import org.apache.mahout.cf.taste.impl.similarity.CosyItemSimilarity;
+import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
+import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+public class RecommendationSystem {
+
+    public static void main(String[] args) {
+        try {
+            // Load the data from CSV file (user-product interaction data)
+            DataModel model = new FileDataModel(new File("user_product_ratings.csv"));
+
+            // Create the item similarity model (Cosine similarity in this case)
+            ItemSimilarity similarity = new CosyItemSimilarity(model);
+
+            // Create a recommender based on item similarity
+            Recommender recommender = new GenericItemBasedRecommender(model, similarity);
+
+            // Get recommendations for a user (user 1 for example)
+            List<RecommendedItem> recommendations = recommender.recommend(1, 3);  // 3 recommendations for user 1
+
+            // Print the recommendations
+            System.out.println("Recommended products for user 1:");
+            for (RecommendedItem recommendation : recommendations) {
+                System.out.println("Product ID: " + recommendation.getItemID() + ", Value: " + recommendation.getValue());
+            }
+
+        } catch (IOException | TasteException e) {
+            e.printStackTrace();
+        }
+    }
+}
